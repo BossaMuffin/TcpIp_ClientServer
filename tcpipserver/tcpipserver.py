@@ -87,14 +87,14 @@ class TcpIpServer:
             client_connection.close()
 
 
-    def closeServer(self):
+    def closeserver(self):
         """
 
         :return:
         """
-        print(f'Stop the server.')
         try:
             self.sock.close()
+            print(f'Stop the server nicely.')
             self.running = False
         except Exception as error:
             print(f'Server doesn\'t stop [{error}]')

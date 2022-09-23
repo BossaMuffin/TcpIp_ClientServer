@@ -5,16 +5,21 @@ class TcpIpClient:
     """
 
     """
-    def __init__(self):
+    def __init__(self,
+                 SERV_IPV4: str='127.0.0.1',
+                 SERV_PORT: int=8080,
+                 ATTEMPTS_LIMIT: str=10):
         """
 
         :param server_ipv4:
         :param server_port:
         """
-        self.serv_ipv4 = '127.0.0.1'
-        self.serv_port = '8080'
+        self.serv_ipv4 = SERV_IPV4
+        self.serv_port = SERV_PORT
         self.sock = None
         self.running = False
+        self.attempts_limit = ATTEMPTS_LIMIT
+        self.connexion_attempts = 0
 
     def newconnectedsock(self, server_ipv4: str, server_port: int):
         """
@@ -31,6 +36,7 @@ class TcpIpClient:
             print(f'Connecting to {server_ipv4}:{server_port}')
             self.running = True
         except Exception as error:
+            self.connexion_attempts += 1
             print(f'Connection failed on {server_ipv4}:{str(server_port)} > [{error}]')
 
     def senddata(self, data_to_send: str, chunk_len: int = 16):
@@ -59,7 +65,10 @@ class TcpIpClient:
                 amount_received += len(data_received)
                 print(f'>> Received {data_received}')
         finally:
-            # Clean up the connection
-            print(f'> Close the connection with {self.serv_ipv4}')
-            self.running = False
-            self.sock.close()
+            self.quitconnexion()
+
+    def quitconnexion(self):
+        # Clean up the connection
+        print(f'> Close the connection nicely')
+        self.running = False
+        self.sock.close()
