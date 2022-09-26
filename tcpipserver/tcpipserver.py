@@ -1,28 +1,19 @@
 import socket
+import sys
+sys.path.insert(0, "../log")
+import log
 
 
 class TcpIpServer:
-    """
-    """
-    def __init__(self, server_ipv4: str, server_port: int):
-        """
 
-        :param server_ipv4:
-        :param server_port:
-        """
-        self.ipv4 = server_ipv4
-        self.port = server_port
+    def __init__(self, server_ipv4: str, server_port: int):
+        self._ipv4 = server_ipv4
+        self._port = server_port
         self.sock = None
         self.running = False
-        self.newlisteningsock(self.ipv4, self.port)
+        self.newlisteningsock(self._ipv4, self._port)
 
-    def newlisteningsock(self, server_ipv4: str, server_port: int):
-        """
-
-        :param server_ipv4:
-        :param server_port:
-        :return:
-        """
+    def newlisteningsock(self, server_ipv4: str, server_port: int) -> None:
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         # Bind the socket to a public host, and a well-known port
         self.sock.bind((server_ipv4, server_port))
@@ -32,11 +23,7 @@ class TcpIpServer:
         self.sock.listen(5)
         self.running = True
 
-    def listeningforclients(self):
-        """
-
-        :return:
-        """
+    def listeningforclients(self) -> None:
         while self.running:
             # Accept connections from outside
             print(f'\nWaiting for a connection')
@@ -45,18 +32,15 @@ class TcpIpServer:
             # Now do something with the client socket
             self._receiveddata(client_connection, client_ipv4)
 
-    def _receiveddata(self, client_connection, client_address: str, chunk_len: int = 16):
-        """
-
-        :param client_connection:
-        :param client_address:
-        :param chunk_len:
-        :return:
-        """
+    def _receiveddata(self,
+                      client_connection,
+                      client_address: str,
+                      chunk_len: int = 16
+                      ) -> None:
         i_chunk = 0
         chunks = []
         try:
-            print(f'> Connection from {client_address}')
+            log.info(f'[CONNECTION] from {client_address}')
             # Receive the data in small chunks and retransmit it
 
             while True:
@@ -82,19 +66,15 @@ class TcpIpServer:
                   f' = {i_full_chunks} chunks({chunk_len})'
                   f' + 1 chunk({last_chunk_len}) chars]'
                   f'\n    [message: "{message_received}"]')
+            log.info(f'[RECEIVED] from {client_address}, amount: {amount_received}, by: {chunk_len} chunks')
             # Clean up the connection
             print(f'> Close the connection with {client_address}')
             client_connection.close()
 
-
-    def closeserver(self):
-        """
-
-        :return:
-        """
+    def closeserver(self) -> None:
         try:
             self.sock.close()
             print(f'Stop the server nicely.')
             self.running = False
-        except Exception as error:
-            print(f'Server doesn\'t stop [{error}]')
+        except Exception as err:
+            log.warning(f'[ERROR] Server doesn\'t stop [{err}]')

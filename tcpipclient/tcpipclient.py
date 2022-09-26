@@ -1,29 +1,27 @@
+import sys
 import socket
+sys.path.insert(0, "../log")
+import log
 
 
 class TcpIpClient:
-    """
-
-    """
     def __init__(self,
-                 SERV_IPV4: str='127.0.0.1',
-                 SERV_PORT: int=8080,
-                 ATTEMPTS_LIMIT: str=10):
+                 serv_ipv4: str = '127.0.0.1',
+                 serv_port: int = 8080,
+                 attempts_limit: int = 10):
         """
-
         :param server_ipv4:
         :param server_port:
         """
-        self.serv_ipv4 = SERV_IPV4
-        self.serv_port = SERV_PORT
+        self._serv_ipv4 = serv_ipv4
+        self._serv_port = serv_port
         self.sock = None
         self.running = False
-        self.attempts_limit = ATTEMPTS_LIMIT
+        self._attempts_limit = attempts_limit
         self.connexion_attempts = 0
 
-    def newconnectedsock(self, server_ipv4: str, server_port: int):
+    def newconnectedsock(self, server_ipv4: str, server_port: int) -> None:
         """
-
         :param server_ipv4:
         :param server_port:
         :return:
@@ -33,15 +31,14 @@ class TcpIpClient:
         # Connect the socket to the port where the server is listening
         try:
             self.sock.connect((server_ipv4, server_port))
-            print(f'Connecting to {server_ipv4}:{server_port}')
+            log.info(f'[CONNECTION] @{server_ipv4}:{server_port}')
             self.running = True
         except Exception as error:
             self.connexion_attempts += 1
-            print(f'Connection failed on {server_ipv4}:{str(server_port)} > [{error}]')
+            log.error(f'[FAIL] Connection failed on {server_ipv4}:{str(server_port)} > [{error}]')
 
-    def senddata(self, data_to_send: str, chunk_len: int = 16):
+    def senddata(self, data_to_send: str, chunk_len: int = 16) -> None:
         """
-
         :param data_to_send:
         :param chunk_len:
         :return:
@@ -52,7 +49,7 @@ class TcpIpClient:
         last_chunk_len = amount_expected % chunk_len
         try:
             # Send data
-            print(f'> Sending to {self.serv_ipv4}:{self.serv_port}'
+            print(f'> Sending to {self._serv_ipv4}:{self._serv_port}'
                   f'\n    [amount: {amount_expected}'
                   f' = {i_chunks_expected} chunks({chunk_len})'
                   f' + 1 chunk({last_chunk_len}) chars]'
@@ -67,7 +64,7 @@ class TcpIpClient:
         finally:
             self.quitconnexion()
 
-    def quitconnexion(self):
+    def quitconnexion(self) -> None:
         # Clean up the connection
         print(f'> Close the connection nicely')
         self.running = False

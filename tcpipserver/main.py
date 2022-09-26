@@ -1,41 +1,23 @@
 import tcpipserver as srv
-import logging
-import os
+import sys
+from config import read_config
+sys.path.insert(0, "../log")
+import log
 
-HOST_IPV4 = '138.195.237.247'
-#HOST_IPV4 = '127.0.0.1'
-HOST_PORT = 8080
-SEPARATOR = '-------------------------------------\n'
+config = read_config("config/config.json")
 
 if __name__ == '__main__':
-    hostuser = os.getlogin()
-    logging.basicConfig(level=logging.DEBUG,
-                        filename="tcpipserver.log",
-                        filemode="a",
-                        format=f"[{hostuser}] - %(asctime)s - %(levelname)s - %(message)s")
-
-    """
-    Exemple :
-    logging.debug("La fonction a bien été exécutée")
-    logging.info("Message d'information général")
-    logging.warning("Attention !")
-    logging.error("Une erreur est arrivée")
-    logging.critical("Erreur critique")
-    """
-
-    server = srv.TcpIpServer(HOST_IPV4, HOST_PORT)
-    logging.info("Program is starting ...")
+    server = srv.TcpIpServer(config.HOST_IPV4, config.HOST_PORT)
+    log.info("[BEGIN] Server script is starting ...")
 
     try:
-            server.listeningforclients()
-            logging.info(f'[LISTENING] server @{HOST_IPV4}:{HOST_PORT}')
-            print(SEPARATOR)
+        server.listeningforclients()
+        log.info(f'[LISTENING] server @{config.HOST_IPV4}:{config.HOST_PORT}')
+        print(config.SEPARATOR)
     except ConnectionResetError:
-            print(f'Catch ConnectionResetError : from client @{HOST_IPV4}:{HOST_PORT}')
-            logging.info(f'[CLOSING] interrupt server from client @{HOST_IPV4}:{HOST_PORT}')
+        log.critical(f'[CLOSING] ConnectionResetError : interrupt server from client @{config.HOST_IPV4}:{config.HOST_PORT}')
 
     except KeyboardInterrupt:
-            print(f'Catch KeyboardInterrupt : asks to close the server socket @{HOST_IPV4}:{HOST_PORT}')
-            logging.info(f'[CLOSING] interrupt server by keyboard @{HOST_IPV4}:{HOST_PORT}')
+        log.critical(f'[CLOSING] KeyboardInterrupt : interrupt server @{config.HOST_IPV4}:{config.HOST_PORT}')
 
     server.closeserver()

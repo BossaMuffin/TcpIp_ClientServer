@@ -1,0 +1,12 @@
+{
+  "ATTEMPTS_BUFFER": 1,
+  "ATTEMPTS_LIMIT": 10,
+  "HOST_IPV4": "138.195.237.247",
+  "HOST_PORT": 8080,
+  "MESSAGES_LIST": [
+    "Hello Me.",
+    "Helloo YooU :)",
+    "HellooO WooOrld !"
+  ],
+  "SEPARATOR": "-------------------------------------\n"
+}
