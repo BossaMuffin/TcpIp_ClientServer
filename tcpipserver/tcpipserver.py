@@ -1,16 +1,19 @@
 import socket
 import sys
+
 sys.path.insert(0, "../log")
 import log
 
 
 class TcpIpServer:
 
-    def __init__(self, server_ipv4: str, server_port: int):
+    def __init__(self, server_ipv4: str, server_port: int, clients_limit: int = 10):
         self._ipv4 = server_ipv4
         self._port = server_port
         self.sock = None
         self.running = False
+        self.clients = 0
+        self._clients_limit = clients_limit
         self.newlisteningsock(self._ipv4, self._port)
 
     def newlisteningsock(self, server_ipv4: str, server_port: int) -> None:
@@ -24,11 +27,12 @@ class TcpIpServer:
         self.running = True
 
     def listeningforclients(self) -> None:
-        while self.running:
+        while self.running and self.clients < self._clients_limit:
             # Accept connections from outside
             print(f'\nWaiting for a connection')
             print('...\n')
             client_connection, client_ipv4 = self.sock.accept()
+            self.clients += 1
             # Now do something with the client socket
             self._receiveddata(client_connection, client_ipv4)
 
@@ -69,10 +73,11 @@ class TcpIpServer:
             log.info(f'[RECEIVED] from {client_address}, amount: {amount_received}, by: {chunk_len} chunks')
             # Clean up the connection
             print(f'> Close the connection with {client_address}')
-            client_connection.close()
+            client_connection.shutdown(1)
 
     def closeserver(self) -> None:
         try:
+            self.sock.shutdown(1)
             self.sock.close()
             print(f'Stop the server nicely.')
             self.running = False

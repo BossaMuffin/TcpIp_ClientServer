@@ -7,6 +7,8 @@ import json
 class ServerConfig:
     HOST_IPV4: str
     HOST_PORT: int
+    ATTEMPTS_BUFFER_MIN: int
+    CONNEXIONS_LIMIT: int
     SEPARATOR: str
 
 

@@ -61,11 +61,14 @@ class TcpIpClient:
                 data_received = self.sock.recv(16)
                 amount_received += len(data_received)
                 print(f'>> Received {data_received}')
+
         finally:
-            self.quitconnexion()
+            #self.quitconnexion()
+            self.sock.shutdown(1)
 
     def quitconnexion(self) -> None:
         # Clean up the connection
         print(f'> Close the connection nicely')
         self.running = False
         self.sock.close()
+
